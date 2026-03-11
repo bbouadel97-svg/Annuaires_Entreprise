@@ -43,5 +43,21 @@ namespace AnnuaireEntreprise.Data
 
             command.ExecuteNonQuery();
         }
+
+        // Ajouter des données test pour Sites et Services
+        public void SeedData()
+        {
+            using var connection = GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+            INSERT OR IGNORE INTO Sites (Id, Ville) VALUES (1, 'Paris');
+            INSERT OR IGNORE INTO Sites (Id, Ville) VALUES (2, 'Lyon');
+            INSERT OR IGNORE INTO Services (Id, Nom) VALUES (1, 'Informatique');
+            INSERT OR IGNORE INTO Services (Id, Nom) VALUES (2, 'Ressources Humaines');
+            ";
+            command.ExecuteNonQuery();
+        }
     }
 }

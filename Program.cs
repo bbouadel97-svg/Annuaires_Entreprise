@@ -10,6 +10,7 @@ class Program
     {
         Database db = new Database();
         db.CreateTables(); // Assure-toi que les tables existent
+        db.SeedData(); // <-- ça va créer Sites et Services de test
 
         SalarieService service = new SalarieService();
 
