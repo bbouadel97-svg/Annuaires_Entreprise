@@ -312,11 +312,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
+      "projectUniqueName": "c:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
       "projectName": "AnnuaireEntreprise",
-      "projectPath": "C:\\Users\\User\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
+      "projectPath": "c:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\AnnuaireEntreprise\\obj\\",
+      "outputPath": "c:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -325,6 +325,7 @@
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
