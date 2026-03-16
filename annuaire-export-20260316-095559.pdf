@@ -1,0 +1,52 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [ 3 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 764 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 40 800 Tm
+(Annuaire Entreprise - Export base de donnees) Tj
+1 0 0 1 40 782 Tm
+(Date: 16/03/2026 09:55) Tj
+1 0 0 1 40 764 Tm
+(Fichier DB: C:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\annuaire.db) Tj
+1 0 0 1 40 746 Tm
+() Tj
+1 0 0 1 40 728 Tm
+(Nombre de salaries: 3) Tj
+1 0 0 1 40 710 Tm
+() Tj
+1 0 0 1 40 692 Tm
+(- Dupont Jean | jean.dupont@test.com | Fixe: 0102030405 | Portable: 0607080910 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 674 Tm
+(- Dupont Jean | jean.dupont@test.com | Fixe: 0102030405 | Portable: 0607080910 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 656 Tm
+(- Ait Lahcen | aitlahcen@gmail.com | Fixe: 0514458596 | Portable: 0645859612 | Service: Informatique | Site: Paris) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000062 00000 n 
+0000000124 00000 n 
+0000000253 00000 n 
+0000001070 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1143
+%%EOF

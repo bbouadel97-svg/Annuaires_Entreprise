@@ -5,11 +5,54 @@ namespace AnnuaireEntreprise.Data
 {
     public class Database
     {
-        private readonly string connectionString = $"Data Source={Path.Combine(FileSystem.Current.AppDataDirectory, "annuaire.db")}";
+        private readonly string databasePath;
 
-        public SqliteConnection GetConnection()
+        public Database()
         {
-            return new SqliteConnection(connectionString);
+            databasePath = ResolveDatabasePath();
+        }
+
+        private static string ResolveDatabasePath()
+        {
+            // During local development, prefer annuaire.db found by walking up from the app base folder.
+            var currentPath = AppContext.BaseDirectory;
+            for (var i = 0; i < 10; i++)
+            {
+                var candidate = Path.Combine(currentPath, "annuaire.db");
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                var parent = Directory.GetParent(currentPath);
+                if (parent is null)
+                {
+                    break;
+                }
+
+                currentPath = parent.FullName;
+            }
+
+            var appDataPath = Path.Combine(FileSystem.Current.AppDataDirectory, "annuaire.db");
+            var appDataDirectory = Path.GetDirectoryName(appDataPath);
+            if (!string.IsNullOrWhiteSpace(appDataDirectory))
+            {
+                Directory.CreateDirectory(appDataDirectory);
+            }
+
+            return appDataPath;
+        }
+
+        private string ConnectionString => $"Data Source={databasePath}";
+
+        public string GetDatabasePath()
+        {
+            return databasePath;
+        }
+
+        public Microsoft.Data.Sqlite.SqliteConnection GetConnection()
+        {
+            return new Microsoft.Data.Sqlite.SqliteConnection(ConnectionString);
         }
 
         public void CreateTables()

@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Text;
 using AnnuaireEntreprise.Data;
 using AnnuaireEntreprise.Models;
 using AnnuaireEntreprise.Services;
@@ -10,6 +12,7 @@ public partial class MainPage : ContentPage
 	private readonly SalarieService _salarieService = new();
 	private readonly ServiceService _serviceService = new();
 	private readonly SiteService _siteService = new();
+	private string _databasePath = string.Empty;
 
 	private List<Service> _services = new();
 	private List<Site> _sites = new();
@@ -32,6 +35,8 @@ public partial class MainPage : ContentPage
 		var db = new Database();
 		db.CreateTables();
 		db.SeedData();
+		_databasePath = db.GetDatabasePath();
+		DbPathLabel.Text = $"Base locale: {_databasePath}";
 	}
 
 	private void LoadReferenceData()
@@ -130,6 +135,166 @@ public partial class MainPage : ContentPage
 	private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
 	{
 		LoadSalaries(e.NewTextValue);
+	}
+
+	private void OnClearSearchClicked(object? sender, EventArgs e)
+	{
+		SearchEntry.Text = string.Empty;
+		LoadSalaries();
+	}
+
+	private async void OnExportDbPdfClicked(object? sender, EventArgs e)
+	{
+		try
+		{
+			LoadReferenceData();
+			_allSalaries = _salarieService.Lister();
+
+			var exportDirectory = Path.GetDirectoryName(_databasePath);
+			if (string.IsNullOrWhiteSpace(exportDirectory) || !Directory.Exists(exportDirectory))
+			{
+				exportDirectory = FileSystem.Current.AppDataDirectory;
+			}
+
+			var fileName = $"annuaire-export-{DateTime.Now:yyyyMMdd-HHmmss}.pdf";
+			var exportPath = Path.Combine(exportDirectory, fileName);
+			var pdfBytes = BuildPdfDocument();
+
+			File.WriteAllBytes(exportPath, pdfBytes);
+			await DisplayAlertAsync("Export termine", $"PDF genere:\n{exportPath}", "OK");
+		}
+		catch (Exception ex)
+		{
+			await DisplayAlertAsync("Erreur", $"Impossible d'exporter en PDF: {ex.Message}", "OK");
+		}
+	}
+
+	private byte[] BuildPdfDocument()
+	{
+		var lines = new List<string>
+		{
+			"Annuaire Entreprise - Export base de donnees",
+			$"Date: {DateTime.Now:dd/MM/yyyy HH:mm}",
+			$"Fichier DB: {_databasePath}",
+			"",
+			$"Nombre de salaries: {_allSalaries.Count}",
+			""
+		};
+
+		foreach (var salarie in _allSalaries)
+		{
+			var serviceName = _services.Find(s => s.Id == salarie.ServiceId)?.Nom ?? "Service inconnu";
+			var siteName = _sites.Find(s => s.Id == salarie.SiteId)?.Ville ?? "Site inconnu";
+			lines.Add($"- {salarie.Nom} {salarie.Prenom} | {salarie.Email} | Fixe: {salarie.TelephoneFixe} | Portable: {salarie.TelephonePortable} | Service: {serviceName} | Site: {siteName}");
+		}
+
+		if (_allSalaries.Count == 0)
+		{
+			lines.Add("Aucun salarie dans la base.");
+		}
+
+		const int linesPerPage = 42;
+		var pageChunks = lines
+			.Select((line, index) => new { line, index })
+			.GroupBy(item => item.index / linesPerPage)
+			.Select(group => group.Select(item => item.line).ToList())
+			.ToList();
+
+		if (pageChunks.Count == 0)
+		{
+			pageChunks.Add(new List<string> { "Document vide." });
+		}
+
+		var pageCount = pageChunks.Count;
+		var fontObjectId = 3 + (2 * pageCount);
+		var objectCount = fontObjectId;
+		var objects = new string[objectCount + 1];
+
+		objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+
+		var kids = string.Join(" ", Enumerable.Range(0, pageCount).Select(i => $"{3 + i} 0 R"));
+		objects[2] = $"<< /Type /Pages /Count {pageCount} /Kids [ {kids} ] >>";
+
+		for (var i = 0; i < pageCount; i++)
+		{
+			var pageObjectId = 3 + i;
+			var contentObjectId = 3 + pageCount + i;
+			objects[pageObjectId] = $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 {fontObjectId} 0 R >> >> /Contents {contentObjectId} 0 R >>";
+
+			var streamBuilder = new StringBuilder();
+			streamBuilder.AppendLine("BT");
+			streamBuilder.AppendLine("/F1 11 Tf");
+
+			var y = 800;
+			foreach (var rawLine in pageChunks[i])
+			{
+				var safeLine = EscapePdfLiteral(ToAscii(rawLine));
+				streamBuilder.AppendLine($"1 0 0 1 40 {y} Tm");
+				streamBuilder.AppendLine($"({safeLine}) Tj");
+				y -= 18;
+			}
+
+			streamBuilder.AppendLine("ET");
+
+			var streamContent = streamBuilder.ToString();
+			var streamLength = Encoding.ASCII.GetByteCount(streamContent);
+			objects[contentObjectId] = $"<< /Length {streamLength} >>\nstream\n{streamContent}endstream";
+		}
+
+		objects[fontObjectId] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
+
+		var pdfBuilder = new StringBuilder();
+		pdfBuilder.AppendLine("%PDF-1.4");
+
+		var offsets = new int[objectCount + 1];
+		for (var i = 1; i <= objectCount; i++)
+		{
+			offsets[i] = Encoding.ASCII.GetByteCount(pdfBuilder.ToString());
+			pdfBuilder.AppendLine($"{i} 0 obj");
+			pdfBuilder.AppendLine(objects[i]);
+			pdfBuilder.AppendLine("endobj");
+		}
+
+		var xrefOffset = Encoding.ASCII.GetByteCount(pdfBuilder.ToString());
+		pdfBuilder.AppendLine("xref");
+		pdfBuilder.AppendLine($"0 {objectCount + 1}");
+		pdfBuilder.AppendLine("0000000000 65535 f ");
+
+		for (var i = 1; i <= objectCount; i++)
+		{
+			pdfBuilder.AppendLine($"{offsets[i]:D10} 00000 n ");
+		}
+
+		pdfBuilder.AppendLine("trailer");
+		pdfBuilder.AppendLine($"<< /Size {objectCount + 1} /Root 1 0 R >>");
+		pdfBuilder.AppendLine("startxref");
+		pdfBuilder.AppendLine(xrefOffset.ToString());
+		pdfBuilder.Append("%%EOF");
+
+		return Encoding.ASCII.GetBytes(pdfBuilder.ToString());
+	}
+
+	private static string EscapePdfLiteral(string input)
+	{
+		return input.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
+	}
+
+	private static string ToAscii(string input)
+	{
+		var normalized = input.Normalize(NormalizationForm.FormD);
+		var builder = new StringBuilder();
+
+		foreach (var c in normalized)
+		{
+			if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark)
+			{
+				continue;
+			}
+
+			builder.Append(c is >= ' ' and <= '~' ? c : ' ');
+		}
+
+		return builder.ToString();
 	}
 
 	private void ClearForm()
