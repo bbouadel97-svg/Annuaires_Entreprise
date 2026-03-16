@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AnnuaireEntreprise.MainPage"
+             Title="Annuaire Entreprise">
+
+    <Grid RowDefinitions="Auto,*" Padding="20">
+        <VerticalStackLayout Spacing="10">
+            <Label Text="Annuaire Entreprise" FontSize="28" FontAttributes="Bold" />
+            <Label Text="Gestion des salaries" FontSize="14" TextColor="Gray" />
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                <Entry x:Name="SearchEntry"
+                       Grid.Column="0"
+                       Placeholder="Rechercher par nom"
+                       TextChanged="OnSearchTextChanged" />
+                <Button Grid.Column="1" Text="Actualiser" Clicked="OnRefreshClicked" />
+                <Button Grid.Column="2" Text="Ajouter" Clicked="OnAddClicked" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Entry x:Name="NomEntry" Grid.Column="0" Placeholder="Nom" />
+                <Entry x:Name="PrenomEntry" Grid.Column="1" Placeholder="Prenom" />
+                <Entry x:Name="EmailEntry" Grid.Column="2" Placeholder="Email" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                <Entry x:Name="FixeEntry" Grid.Column="0" Placeholder="Tel fixe" />
+                <Entry x:Name="PortableEntry" Grid.Column="1" Placeholder="Tel portable" />
+                <Picker x:Name="ServicePicker" Grid.Column="2" Title="Service" ItemDisplayBinding="{Binding Nom}" />
+                <Picker x:Name="SitePicker" Grid.Column="3" Title="Site" ItemDisplayBinding="{Binding Ville}" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" Margin="0,20,0,0" ItemsSource="{Binding Salaries}">
+            <CollectionView.EmptyView>
+                <Label Text="Aucun salarie trouve." HorizontalOptions="Center" Margin="0,30,0,0" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border StrokeThickness="1" Stroke="#DDDDDD" StrokeShape="RoundRectangle 8" Margin="0,0,0,8" Padding="10">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                            <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16" Text="{Binding NomComplet}" />
+                            <Button Grid.Row="0" Grid.Column="1"
+                                    Text="Supprimer"
+                                    BackgroundColor="#D32F2F"
+                                    TextColor="White"
+                                    Clicked="OnDeleteClicked"
+                                    CommandParameter="{Binding Id}" />
+                            <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" />
+                            <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Details}" TextColor="Gray" FontSize="12" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

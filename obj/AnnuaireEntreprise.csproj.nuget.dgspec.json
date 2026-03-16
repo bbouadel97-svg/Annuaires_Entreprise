@@ -17,15 +17,15 @@
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net10.0"
+          "net10.0-windows10.0.19041.0"
         ],
         "sources": {
           "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net10.0": {
-            "targetAlias": "net10.0",
+          "net10.0-windows10.0.19041": {
+            "targetAlias": "net10.0-windows10.0.19041.0",
             "projectReferences": {}
           }
         },
@@ -42,12 +42,20 @@
         "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
-        "net10.0": {
-          "targetAlias": "net10.0",
+        "net10.0-windows10.0.19041": {
+          "targetAlias": "net10.0-windows10.0.19041.0",
           "dependencies": {
             "Microsoft.Data.Sqlite": {
               "target": "Package",
               "version": "[10.0.3, )"
+            },
+            "Microsoft.Extensions.Logging.Debug": {
+              "target": "Package",
+              "version": "[10.0.0, )"
+            },
+            "Microsoft.Maui.Controls": {
+              "target": "Package",
+              "version": "[10.0.20, )"
             }
           },
           "imports": [
@@ -61,8 +69,17 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.Windows.SDK.NET.Ref",
+              "version": "[10.0.19041.57, 10.0.19041.57]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.Windows.SDK.NET.Ref.Windows": {
               "privateAssets": "all"
             }
           },
@@ -341,6 +358,11 @@
             "System.Xml.XPath": "(,4.3.32767]",
             "System.Xml.XPath.XDocument": "(,5.0.32767]"
           }
+        }
+      },
+      "runtimes": {
+        "win-x64": {
+          "#import": []
         }
       }
     }

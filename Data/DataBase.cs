@@ -1,10 +1,11 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Maui.Storage;
 
 namespace AnnuaireEntreprise.Data
 {
     public class Database
     {
-        private string connectionString = "Data Source=annuaire.db";
+        private readonly string connectionString = $"Data Source={Path.Combine(FileSystem.Current.AppDataDirectory, "annuaire.db")}";
 
         public SqliteConnection GetConnection()
         {
