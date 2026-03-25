@@ -1,0 +1,112 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [ 3 0 R ] >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 5609 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 40 800 Tm
+(Annuaire Entreprise - Export base de donnees) Tj
+1 0 0 1 40 782 Tm
+(Date: 25/03/2026 09:44) Tj
+1 0 0 1 40 764 Tm
+(Fichier DB: C:\\Users\\User\\OneDrive\\Bureau\\Mes Projets 2eme_Sem\\AnnuaireEntreprise\\annuaire.db) Tj
+1 0 0 1 40 746 Tm
+() Tj
+1 0 0 1 40 728 Tm
+(Nombre de salaries: 33) Tj
+1 0 0 1 40 710 Tm
+() Tj
+1 0 0 1 40 692 Tm
+(- Dupont Jean | jean.dupont@test.com | Fixe: 0102030405 | Portable: 0607080910 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 674 Tm
+(- Dupont Jean | jean.dupont@test.com | Fixe: 0102030405 | Portable: 0607080910 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 656 Tm
+(- Ait Lahcen | aitlahcen@gmail.com | Fixe: 0514458596 | Portable: 0645859612 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 638 Tm
+(- Mathieu Maeva | maeva.mathieu@example.com | Fixe: 04-44-34-56-16 | Portable: 06-24-89-72-27 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 620 Tm
+(- Garcia Marine | marine.garcia@example.com | Fixe: 01-15-15-27-98 | Portable: 06-87-60-83-84 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 602 Tm
+(- Barbier Justin | justin.barbier@example.com | Fixe: 04-21-52-94-40 | Portable: 06-06-92-89-19 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 584 Tm
+(- Roussel Manon | manon.roussel@example.com | Fixe: 01-75-93-08-21 | Portable: 06-90-48-91-26 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 566 Tm
+(- Fleury Soren | soren.fleury@example.com | Fixe: 04-67-08-71-89 | Portable: 06-72-91-56-16 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 548 Tm
+(- Berger Fabio | fabio.berger@example.com | Fixe: 03-31-16-69-63 | Portable: 06-30-13-50-80 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 530 Tm
+(- Le gall Elio | elio.legall@example.com | Fixe: 02-05-99-67-29 | Portable: 06-82-10-63-97 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 512 Tm
+(- Blanc Leane | leane.blanc@example.com | Fixe: 03-92-56-56-11 | Portable: 06-48-45-23-75 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 494 Tm
+(- Leroux Garance | garance.leroux@example.com | Fixe: 02-36-49-92-71 | Portable: 06-67-99-83-37 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 476 Tm
+(- Richard Alois | alois.richard@example.com | Fixe: 02-76-78-91-45 | Portable: 06-94-14-60-64 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 458 Tm
+(- Hubert Aurelien | aurelien.hubert@example.com | Fixe: 05-77-87-79-88 | Portable: 06-70-57-34-96 | Service: Informatique | Site: Lyon) Tj
+1 0 0 1 40 440 Tm
+(- Renard Johan | johan.renard@example.com | Fixe: 05-60-70-43-11 | Portable: 06-21-06-24-72 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 422 Tm
+(- Morin Nael | nael.morin@example.com | Fixe: 05-22-40-31-76 | Portable: 06-17-23-97-75 | Service: Informatique | Site: Lyon) Tj
+1 0 0 1 40 404 Tm
+(- Blanc Maelie | maelie.blanc@example.com | Fixe: 02-23-54-23-15 | Portable: 06-17-46-48-38 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 386 Tm
+(- Le gall Faustine | faustine.legall@example.com | Fixe: 05-81-32-47-90 | Portable: 06-69-43-99-89 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 368 Tm
+(- Moreau Lenny | lenny.moreau@example.com | Fixe: 04-74-72-14-68 | Portable: 06-63-81-51-31 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 350 Tm
+(- Charles Camille | camille.charles@example.com | Fixe: 04-62-71-33-24 | Portable: 06-44-70-78-92 | Service: Informatique | Site: Lyon) Tj
+1 0 0 1 40 332 Tm
+(- Brunet Capucine | capucine.brunet@example.com | Fixe: 04-29-14-85-34 | Portable: 06-55-18-06-73 | Service: Informatique | Site: Lyon) Tj
+1 0 0 1 40 314 Tm
+(- Garnier Lana | lana.garnier@example.com | Fixe: 02-75-97-92-12 | Portable: 06-76-65-06-69 | Service: Informatique | Site: Lyon) Tj
+1 0 0 1 40 296 Tm
+(- Gauthier Maelie | maelie.gauthier@example.com | Fixe: 01-17-61-90-50 | Portable: 06-57-61-17-92 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 278 Tm
+(- Robert Edouard | edouard.robert@example.com | Fixe: 01-66-29-42-03 | Portable: 06-07-65-64-54 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 260 Tm
+(- Dumas Marilou | marilou.dumas@example.com | Fixe: 01-33-17-93-10 | Portable: 06-65-79-46-09 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 242 Tm
+(- Lefevre Liam | liam.lefevre@example.com | Fixe: 05-44-46-80-95 | Portable: 06-56-49-55-50 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 224 Tm
+(- Gaillard Fabio | fabio.gaillard@example.com | Fixe: 04-42-51-45-68 | Portable: 06-30-37-66-92 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 206 Tm
+(- Roussel Louison | louison.roussel@example.com | Fixe: 03-43-62-90-19 | Portable: 06-23-45-71-90 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 188 Tm
+(- Leroux Lyna | lyna.leroux@example.com | Fixe: 03-20-10-45-44 | Portable: 06-46-41-11-12 | Service: Ressources Humaines | Site: Lyon) Tj
+1 0 0 1 40 170 Tm
+(- Leclercq Morgan | morgan.leclercq@example.com | Fixe: 04-42-08-78-36 | Portable: 06-87-30-63-44 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 152 Tm
+(- Joly Nathanael | nathanael.joly@example.com | Fixe: 04-88-14-74-10 | Portable: 06-96-94-30-69 | Service: Informatique | Site: Paris) Tj
+1 0 0 1 40 134 Tm
+(- Andre Amandine | amandine.andre@example.com | Fixe: 01-91-02-51-67 | Portable: 06-40-24-68-25 | Service: Ressources Humaines | Site: Paris) Tj
+1 0 0 1 40 116 Tm
+(- Roux Louane | louane.roux@example.com | Fixe: 04-48-16-43-51 | Portable: 06-96-89-95-59 | Service: Informatique | Site: Paris) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000062 00000 n 
+0000000124 00000 n 
+0000000253 00000 n 
+0000005916 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+5989
+%%EOF
