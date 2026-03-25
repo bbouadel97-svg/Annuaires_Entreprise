@@ -13,6 +13,8 @@ public partial class MainPage : ContentPage
 	private readonly ServiceService _serviceService = new();
 	private readonly SiteService _siteService = new();
 	private string _databasePath = string.Empty;
+	private const string AdminPin = "1997";
+	private bool _isAdminMode;
 
 	private List<Service> _services = new();
 	private List<Site> _sites = new();
@@ -27,6 +29,7 @@ public partial class MainPage : ContentPage
 
 		InitializeDatabase();
 		LoadReferenceData();
+		UpdateAdminModeUi();
 		LoadSalaries();
 	}
 
@@ -74,6 +77,23 @@ public partial class MainPage : ContentPage
 		}
 	}
 
+	private void UpdateAdminModeUi()
+	{
+		AdminModeButton.Text = _isAdminMode ? "Desactiver mode admin" : "Activer mode admin";
+		AdminModeLabel.Text = _isAdminMode ? "Mode admin active" : "Mode admin desactive";
+		AdminModeLabel.TextColor = _isAdminMode ? Color.FromArgb("#1B5E20") : Color.FromArgb("#B00020");
+
+		AddButton.IsVisible = _isAdminMode;
+		ExportPdfButton.IsVisible = _isAdminMode;
+		AddFormTopGrid.IsVisible = _isAdminMode;
+		AddFormBottomGrid.IsVisible = _isAdminMode;
+
+		if (!_isAdminMode)
+		{
+			ClearForm();
+		}
+	}
+
 	private SalarieItemViewModel ToViewModel(Salarie salarie)
 	{
 		var serviceName = _services.Find(s => s.Id == salarie.ServiceId)?.Nom ?? "Service inconnu";
@@ -84,12 +104,46 @@ public partial class MainPage : ContentPage
 			Id = salarie.Id,
 			NomComplet = $"{salarie.Nom} {salarie.Prenom}",
 			Email = salarie.Email,
-			Details = $"Service: {serviceName} | Site: {siteName} | Fixe: {salarie.TelephoneFixe} | Portable: {salarie.TelephonePortable}"
+			Details = $"Service: {serviceName} | Site: {siteName} | Fixe: {salarie.TelephoneFixe} | Portable: {salarie.TelephonePortable}",
+			IsAdminActionsVisible = _isAdminMode
 		};
+	}
+
+	private async void OnToggleAdminModeClicked(object? sender, EventArgs e)
+	{
+		if (_isAdminMode)
+		{
+			_isAdminMode = false;
+			UpdateAdminModeUi();
+			LoadSalaries(SearchEntry.Text);
+			return;
+		}
+
+		var pin = await DisplayPromptAsync("Mode admin", "Saisis le code administrateur:", "Valider", "Annuler", "Code", maxLength: 32, keyboard: Keyboard.Numeric);
+		if (string.IsNullOrWhiteSpace(pin))
+		{
+			return;
+		}
+
+		if (!string.Equals(pin.Trim(), AdminPin, StringComparison.Ordinal))
+		{
+			await DisplayAlertAsync("Acces refuse", "Code administrateur incorrect.", "OK");
+			return;
+		}
+
+		_isAdminMode = true;
+		UpdateAdminModeUi();
+		LoadSalaries(SearchEntry.Text);
 	}
 
 	private async void OnAddClicked(object? sender, EventArgs e)
 	{
+		if (!_isAdminMode)
+		{
+			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour ajouter un salarie.", "OK");
+			return;
+		}
+
 		if (ServicePicker.SelectedItem is not Service selectedService || SitePicker.SelectedItem is not Site selectedSite)
 		{
 			await DisplayAlertAsync("Selection requise", "Choisis un service et un site.", "OK");
@@ -117,8 +171,14 @@ public partial class MainPage : ContentPage
 		LoadSalaries(SearchEntry.Text);
 	}
 
-	private void OnDeleteClicked(object? sender, EventArgs e)
+	private async void OnDeleteClicked(object? sender, EventArgs e)
 	{
+		if (!_isAdminMode)
+		{
+			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour supprimer un salarie.", "OK");
+			return;
+		}
+
 		if (sender is Button { CommandParameter: int id })
 		{
 			_salarieService.Supprimer(id);
@@ -145,6 +205,12 @@ public partial class MainPage : ContentPage
 
 	private async void OnExportDbPdfClicked(object? sender, EventArgs e)
 	{
+		if (!_isAdminMode)
+		{
+			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour exporter la base en PDF.", "OK");
+			return;
+		}
+
 		try
 		{
 			LoadReferenceData();
@@ -312,5 +378,6 @@ public partial class MainPage : ContentPage
 		public string NomComplet { get; set; } = string.Empty;
 		public string Email { get; set; } = string.Empty;
 		public string Details { get; set; } = string.Empty;
+		public bool IsAdminActionsVisible { get; set; }
 	}
 }

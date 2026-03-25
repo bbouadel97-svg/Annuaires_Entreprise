@@ -3797,11 +3797,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
+      "projectUniqueName": "C:\\Users\\User\\OneDrive\\Bureau\\Mes Projets 2eme_Sem\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
       "projectName": "AnnuaireEntreprise",
-      "projectPath": "C:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
+      "projectPath": "C:\\Users\\User\\OneDrive\\Bureau\\Mes Projets 2eme_Sem\\AnnuaireEntreprise\\AnnuaireEntreprise.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\OneDrive\\Bureau\\AnnuaireEntreprise\\obj\\",
+      "outputPath": "C:\\Users\\User\\OneDrive\\Bureau\\Mes Projets 2eme_Sem\\AnnuaireEntreprise\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"

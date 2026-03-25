@@ -9,6 +9,18 @@
             <Label Text="Annuaire Entreprise" FontSize="28" FontAttributes="Bold" />
             <Label Text="Gestion des salaries" FontSize="14" TextColor="Gray" />
 
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Button x:Name="AdminModeButton"
+                        Grid.Column="0"
+                        Text="Activer mode admin"
+                        Clicked="OnToggleAdminModeClicked" />
+                <Label x:Name="AdminModeLabel"
+                       Grid.Column="1"
+                       VerticalTextAlignment="Center"
+                       Text="Mode admin desactive"
+                       TextColor="#B00020" />
+            </Grid>
+
             <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
                 <Entry x:Name="SearchEntry"
                        Grid.Column="0"
@@ -16,7 +28,7 @@
                        TextChanged="OnSearchTextChanged" />
                 <Button Grid.Column="1" Text="Actualiser" Clicked="OnRefreshClicked" />
                 <Button Grid.Column="2" Text="Vider" Clicked="OnClearSearchClicked" />
-                <Button Grid.Column="3" Text="Ajouter" Clicked="OnAddClicked" />
+                <Button x:Name="AddButton" Grid.Column="3" Text="Ajouter" Clicked="OnAddClicked" />
             </Grid>
 
             <Label x:Name="DbPathLabel"
@@ -24,17 +36,18 @@
                    TextColor="Gray"
                    LineBreakMode="TailTruncation" />
 
-                <Button Text="Exporter DB en PDF"
+                <Button x:Name="ExportPdfButton"
+                    Text="Exporter DB en PDF"
                     HorizontalOptions="Start"
                     Clicked="OnExportDbPdfClicked" />
 
-            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+            <Grid x:Name="AddFormTopGrid" ColumnDefinitions="*,*,*" ColumnSpacing="10">
                 <Entry x:Name="NomEntry" Grid.Column="0" Placeholder="Nom" />
                 <Entry x:Name="PrenomEntry" Grid.Column="1" Placeholder="Prenom" />
                 <Entry x:Name="EmailEntry" Grid.Column="2" Placeholder="Email" />
             </Grid>
 
-            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+            <Grid x:Name="AddFormBottomGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
                 <Entry x:Name="FixeEntry" Grid.Column="0" Placeholder="Tel fixe" />
                 <Entry x:Name="PortableEntry" Grid.Column="1" Placeholder="Tel portable" />
                 <Picker x:Name="ServicePicker" Grid.Column="2" Title="Service" ItemDisplayBinding="{Binding Nom}" />
@@ -56,6 +69,7 @@
                                     Text="Supprimer"
                                     BackgroundColor="#D32F2F"
                                     TextColor="White"
+                                    IsVisible="{Binding IsAdminActionsVisible}"
                                     Clicked="OnDeleteClicked"
                                     CommandParameter="{Binding Id}" />
                             <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" />

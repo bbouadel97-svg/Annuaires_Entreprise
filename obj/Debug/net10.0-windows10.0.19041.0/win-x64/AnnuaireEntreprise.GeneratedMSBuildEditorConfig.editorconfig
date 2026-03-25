@@ -14,7 +14,7 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AnnuaireEntreprise
-build_property.ProjectDir = C:\Users\User\OneDrive\Bureau\AnnuaireEntreprise\
+build_property.ProjectDir = C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTAotOptimizerEnabled = true
@@ -28,7 +28,7 @@ build_property.CsWinRTUseWindowsUIXamlProjections = false
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/User/OneDrive/Bureau/AnnuaireEntreprise/App.xaml]
+[C:/Users/User/OneDrive/Bureau/Mes Projets 2eme_Sem/AnnuaireEntreprise/App.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AnnuaireEntreprise.App.xaml
 build_metadata.AdditionalFiles.TargetPath = App.xaml
@@ -38,7 +38,7 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
-[C:/Users/User/OneDrive/Bureau/AnnuaireEntreprise/AppShell.xaml]
+[C:/Users/User/OneDrive/Bureau/Mes Projets 2eme_Sem/AnnuaireEntreprise/AppShell.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AnnuaireEntreprise.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
@@ -48,7 +48,7 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
-[C:/Users/User/OneDrive/Bureau/AnnuaireEntreprise/MainPage.xaml]
+[C:/Users/User/OneDrive/Bureau/Mes Projets 2eme_Sem/AnnuaireEntreprise/MainPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AnnuaireEntreprise.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
@@ -58,7 +58,7 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
-[C:/Users/User/OneDrive/Bureau/AnnuaireEntreprise/Resources/Styles/Colors.xaml]
+[C:/Users/User/OneDrive/Bureau/Mes Projets 2eme_Sem/AnnuaireEntreprise/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AnnuaireEntreprise.Resources.Styles.Colors.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
@@ -68,7 +68,7 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
-[C:/Users/User/OneDrive/Bureau/AnnuaireEntreprise/Resources/Styles/Styles.xaml]
+[C:/Users/User/OneDrive/Bureau/Mes Projets 2eme_Sem/AnnuaireEntreprise/Resources/Styles/Styles.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = AnnuaireEntreprise.Resources.Styles.Styles.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml
