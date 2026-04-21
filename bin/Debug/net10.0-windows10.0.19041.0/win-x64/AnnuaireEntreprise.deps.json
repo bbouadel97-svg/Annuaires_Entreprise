@@ -9,9 +9,11 @@
     ".NETCoreApp,Version=v10.0/win-x64": {
       "AnnuaireEntreprise/1.0": {
         "dependencies": {
+          "Dapper": "2.1.35",
           "Microsoft.Data.Sqlite": "10.0.3",
           "Microsoft.Extensions.Logging.Debug": "10.0.0",
           "Microsoft.Maui.Controls": "10.0.20",
+          "QuestPDF": "2024.7.1",
           "Microsoft.Web.WebView2.Core.Projection": "1.0.3179.45",
           "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.19041.57"
         },
@@ -28,6 +30,14 @@
           "WinRT.Runtime.dll": {
             "assemblyVersion": "2.2.0.0",
             "fileVersion": "2.2.0.48161"
+          }
+        }
+      },
+      "Dapper/2.1.35": {
+        "runtime": {
+          "lib/net7.0/Dapper.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.1.35.13827"
           }
         }
       },
@@ -528,6 +538,19 @@
           }
         }
       },
+      "QuestPDF/2024.7.1": {
+        "runtime": {
+          "lib/net8.0/QuestPDF.dll": {
+            "assemblyVersion": "2024.7.1.0",
+            "fileVersion": "2024.7.1.0"
+          }
+        },
+        "native": {
+          "runtimes/win-x64/native/QuestPdfSkia.dll": {
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.11",
@@ -586,6 +609,13 @@
       "type": "runtimepack",
       "serviceable": false,
       "sha512": ""
+    },
+    "Dapper/2.1.35": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YKRwjVfrG7GYOovlGyQoMvr1/IJdn+7QzNXJxyMh0YfFF5yvDmTYaJOVYWsckreNjGsGSEtrMTpnzxTUq/tZQw==",
+      "path": "dapper/2.1.35",
+      "hashPath": "dapper.2.1.35.nupkg.sha512"
     },
     "Microsoft.Data.Sqlite/10.0.3": {
       "type": "package",
@@ -761,6 +791,13 @@
       "sha512": "sha512-zeVFVrkFYPkAL1cmXo62D1LVC66VqBiMx+WfZ3aDUmizNECCJewMTk0JwjlgYQcIqxqsK1SjF1CeG74TsokWpQ==",
       "path": "microsoft.windowsappsdk/1.7.250909003",
       "hashPath": "microsoft.windowsappsdk.1.7.250909003.nupkg.sha512"
+    },
+    "QuestPDF/2024.7.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hA2P6rnocq1RZPk6G/IGm6oPFDymd/afLR0mWSOpz3nct2/C6xSJVD7FByWA4sFUqxabqSc+qGg2KChlDMSWeA==",
+      "path": "questpdf/2024.7.1",
+      "hashPath": "questpdf.2024.7.1.nupkg.sha512"
     },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.11": {
       "type": "package",

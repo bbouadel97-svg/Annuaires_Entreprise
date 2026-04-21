@@ -5,11 +5,10 @@ using AnnuaireEntreprise.Data;
 using AnnuaireEntreprise.Models;
 using AnnuaireEntreprise.Services;
 #if WINDOWS
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Input;
 using Windows.System;
-using Windows.UI.Core;
+using WinKeyboardAccelerator = Microsoft.UI.Xaml.Input.KeyboardAccelerator;
+using WinKeyboardAcceleratorInvokedEventArgs = Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs;
 #endif
 
 namespace AnnuaireEntreprise;
@@ -21,10 +20,17 @@ public partial class MainPage : ContentPage
 	private readonly SiteService _siteService = new();
 	private readonly RandomUserService _randomUserService = new();
 	private readonly AuthService _authService = new();
+	private readonly AppLogService _appLogService = new();
+	private readonly PdfExportService _pdfExportService = new();
 	private string _databasePath = string.Empty;
 	private bool _isAdminMode;
 	private bool _shortcutRegistered;
 	private int? _editingSalarieId;
+	private string _currentAdminUsername = string.Empty;
+#if WINDOWS
+	private FrameworkElement? _shortcutOwner;
+	private WinKeyboardAccelerator? _adminKeyboardAccelerator;
+#endif
 
 	private List<Service> _services = new();
 	private List<Site> _sites = new();
@@ -52,7 +58,7 @@ public partial class MainPage : ContentPage
 		db.CreateTables();
 		db.SeedData();
 		_databasePath = db.GetDatabasePath();
-		DbPathLabel.Text = $"Base locale: {_databasePath}";
+		DbPathLabel.Text = $"Base locale: {_databasePath}\nLogs: {_appLogService.GetLogFilePath()}";
 	}
 
 	private void LoadReferenceData()
@@ -154,6 +160,7 @@ public partial class MainPage : ContentPage
 		AddFormTopGrid.IsVisible = _isAdminMode;
 		AddFormBottomGrid.IsVisible = _isAdminMode;
 		AdminPanel.IsVisible = _isAdminMode;
+		LogoutButton.IsVisible = _isAdminMode;
 
 		if (!_isAdminMode)
 		{
@@ -190,6 +197,15 @@ public partial class MainPage : ContentPage
 		await ToggleAdminModeAsync();
 	}
 
+	private void OnLogoutClicked(object? sender, EventArgs e)
+	{
+		_appLogService.LogAdminLogout(_currentAdminUsername);
+		_isAdminMode = false;
+		_currentAdminUsername = string.Empty;
+		UpdateAdminModeUi();
+		ApplyFilters();
+	}
+
 	private async Task ToggleAdminModeAsync()
 	{
 		if (_isAdminMode)
@@ -214,91 +230,110 @@ public partial class MainPage : ContentPage
 
 		if (!_authService.AuthenticateAdmin(username, password))
 		{
+			_appLogService.LogAdminAccess(username, false);
 			await DisplayAlertAsync("Acces refuse", "Identifiant ou mot de passe incorrect.", "OK");
 			return;
 		}
 
 		_isAdminMode = true;
+		_currentAdminUsername = username.Trim();
+		_appLogService.LogAdminAccess(_currentAdminUsername, true);
 		UpdateAdminModeUi();
 		ApplyFilters();
 	}
 
 	private async void OnAddClicked(object? sender, EventArgs e)
 	{
-		if (!_isAdminMode)
+		try
 		{
-			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour ajouter un salarie.", "OK");
-			return;
+			if (!_isAdminMode)
+			{
+				await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour ajouter un salarie.", "OK");
+				return;
+			}
+
+			if (ServicePicker.SelectedItem is not Service selectedService || SitePicker.SelectedItem is not Site selectedSite)
+			{
+				await DisplayAlertAsync("Selection requise", "Choisis un service et un site.", "OK");
+				return;
+			}
+
+			if (string.IsNullOrWhiteSpace(NomEntry.Text) || string.IsNullOrWhiteSpace(PrenomEntry.Text))
+			{
+				await DisplayAlertAsync("Champs requis", "Nom et prenom sont obligatoires.", "OK");
+				return;
+			}
+
+			_salarieService.Ajouter(new Salarie
+			{
+				Nom = NomEntry.Text.Trim(),
+				Prenom = PrenomEntry.Text.Trim(),
+				Email = EmailEntry.Text?.Trim() ?? string.Empty,
+				TelephoneFixe = FixeEntry.Text?.Trim() ?? string.Empty,
+				TelephonePortable = PortableEntry.Text?.Trim() ?? string.Empty,
+				ServiceId = selectedService.Id,
+				SiteId = selectedSite.Id
+			});
+
+			ClearForm();
+			ApplyFilters();
 		}
-
-		if (ServicePicker.SelectedItem is not Service selectedService || SitePicker.SelectedItem is not Site selectedSite)
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Selection requise", "Choisis un service et un site.", "OK");
-			return;
+			_appLogService.LogError("Ajout salarie", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible d'ajouter le salarie: {ex.Message}", "OK");
 		}
-
-		if (string.IsNullOrWhiteSpace(NomEntry.Text) || string.IsNullOrWhiteSpace(PrenomEntry.Text))
-		{
-			await DisplayAlertAsync("Champs requis", "Nom et prenom sont obligatoires.", "OK");
-			return;
-		}
-
-		_salarieService.Ajouter(new Salarie
-		{
-			Nom = NomEntry.Text.Trim(),
-			Prenom = PrenomEntry.Text.Trim(),
-			Email = EmailEntry.Text?.Trim() ?? string.Empty,
-			TelephoneFixe = FixeEntry.Text?.Trim() ?? string.Empty,
-			TelephonePortable = PortableEntry.Text?.Trim() ?? string.Empty,
-			ServiceId = selectedService.Id,
-			SiteId = selectedSite.Id
-		});
-
-		ClearForm();
-		ApplyFilters();
 	}
 
 	private async void OnUpdateSalarieClicked(object? sender, EventArgs e)
 	{
-		if (!_isAdminMode)
+		try
 		{
-			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour modifier un salarie.", "OK");
-			return;
+			if (!_isAdminMode)
+			{
+				await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour modifier un salarie.", "OK");
+				return;
+			}
+
+			if (!_editingSalarieId.HasValue)
+			{
+				await DisplayAlertAsync("Selection requise", "Selectionne d'abord un salarie dans la liste.", "OK");
+				return;
+			}
+
+			if (ServicePicker.SelectedItem is not Service selectedService || SitePicker.SelectedItem is not Site selectedSite)
+			{
+				await DisplayAlertAsync("Selection requise", "Choisis un service et un site.", "OK");
+				return;
+			}
+
+			if (string.IsNullOrWhiteSpace(NomEntry.Text) || string.IsNullOrWhiteSpace(PrenomEntry.Text))
+			{
+				await DisplayAlertAsync("Champs requis", "Nom et prenom sont obligatoires.", "OK");
+				return;
+			}
+
+			_salarieService.Modifier(new Salarie
+			{
+				Id = _editingSalarieId.Value,
+				Nom = NomEntry.Text.Trim(),
+				Prenom = PrenomEntry.Text.Trim(),
+				Email = EmailEntry.Text?.Trim() ?? string.Empty,
+				TelephoneFixe = FixeEntry.Text?.Trim() ?? string.Empty,
+				TelephonePortable = PortableEntry.Text?.Trim() ?? string.Empty,
+				ServiceId = selectedService.Id,
+				SiteId = selectedSite.Id
+			});
+
+			_editingSalarieId = null;
+			ClearForm();
+			ApplyFilters();
 		}
-
-		if (!_editingSalarieId.HasValue)
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Selection requise", "Selectionne d'abord un salarie dans la liste.", "OK");
-			return;
+			_appLogService.LogError("Modification salarie", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de modifier le salarie: {ex.Message}", "OK");
 		}
-
-		if (ServicePicker.SelectedItem is not Service selectedService || SitePicker.SelectedItem is not Site selectedSite)
-		{
-			await DisplayAlertAsync("Selection requise", "Choisis un service et un site.", "OK");
-			return;
-		}
-
-		if (string.IsNullOrWhiteSpace(NomEntry.Text) || string.IsNullOrWhiteSpace(PrenomEntry.Text))
-		{
-			await DisplayAlertAsync("Champs requis", "Nom et prenom sont obligatoires.", "OK");
-			return;
-		}
-
-		_salarieService.Modifier(new Salarie
-		{
-			Id = _editingSalarieId.Value,
-			Nom = NomEntry.Text.Trim(),
-			Prenom = PrenomEntry.Text.Trim(),
-			Email = EmailEntry.Text?.Trim() ?? string.Empty,
-			TelephoneFixe = FixeEntry.Text?.Trim() ?? string.Empty,
-			TelephonePortable = PortableEntry.Text?.Trim() ?? string.Empty,
-			ServiceId = selectedService.Id,
-			SiteId = selectedSite.Id
-		});
-
-		_editingSalarieId = null;
-		ClearForm();
-		ApplyFilters();
 	}
 
 	private async void OnImportApiClicked(object? sender, EventArgs e)
@@ -351,6 +386,7 @@ public partial class MainPage : ContentPage
 		}
 		catch (Exception ex)
 		{
+			_appLogService.LogError("Import API", ex);
 			await DisplayAlertAsync("Erreur API", $"Impossible d'importer depuis l'API: {ex.Message}", "OK");
 		}
 		finally
@@ -361,16 +397,24 @@ public partial class MainPage : ContentPage
 
 	private async void OnDeleteClicked(object? sender, EventArgs e)
 	{
-		if (!_isAdminMode)
+		try
 		{
-			await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour supprimer un salarie.", "OK");
-			return;
-		}
+			if (!_isAdminMode)
+			{
+				await DisplayAlertAsync("Mode admin requis", "Active le mode admin pour supprimer un salarie.", "OK");
+				return;
+			}
 
-		if (sender is Button { CommandParameter: int id })
+			if (sender is Button { CommandParameter: int id })
+			{
+				_salarieService.Supprimer(id);
+				ApplyFilters();
+			}
+		}
+		catch (Exception ex)
 		{
-			_salarieService.Supprimer(id);
-			ApplyFilters();
+			_appLogService.LogError("Suppression salarie", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de supprimer le salarie: {ex.Message}", "OK");
 		}
 	}
 
@@ -450,62 +494,86 @@ public partial class MainPage : ContentPage
 
 	private async void OnAddSiteClicked(object? sender, EventArgs e)
 	{
-		if (!_isAdminMode)
+		try
 		{
-			return;
-		}
+			if (!_isAdminMode)
+			{
+				return;
+			}
 
-		if (string.IsNullOrWhiteSpace(SiteVilleEntry.Text))
+			if (string.IsNullOrWhiteSpace(SiteVilleEntry.Text))
+			{
+				await DisplayAlertAsync("Champ requis", "Saisis la ville du site.", "OK");
+				return;
+			}
+
+			_siteService.Ajouter(new Site { Ville = SiteVilleEntry.Text.Trim() });
+			SiteVilleEntry.Text = string.Empty;
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Champ requis", "Saisis la ville du site.", "OK");
-			return;
+			_appLogService.LogError("Ajout site", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible d'ajouter le site: {ex.Message}", "OK");
 		}
-
-		_siteService.Ajouter(new Site { Ville = SiteVilleEntry.Text.Trim() });
-		SiteVilleEntry.Text = string.Empty;
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private async void OnUpdateSiteClicked(object? sender, EventArgs e)
 	{
-		if (SiteAdminPicker.SelectedItem is not Site selectedSite)
+		try
 		{
-			await DisplayAlertAsync("Selection requise", "Selectionne un site a modifier.", "OK");
-			return;
-		}
+			if (SiteAdminPicker.SelectedItem is not Site selectedSite)
+			{
+				await DisplayAlertAsync("Selection requise", "Selectionne un site a modifier.", "OK");
+				return;
+			}
 
-		if (string.IsNullOrWhiteSpace(SiteVilleEntry.Text))
+			if (string.IsNullOrWhiteSpace(SiteVilleEntry.Text))
+			{
+				await DisplayAlertAsync("Champ requis", "Saisis la nouvelle ville.", "OK");
+				return;
+			}
+
+			selectedSite.Ville = SiteVilleEntry.Text.Trim();
+			_siteService.Modifier(selectedSite);
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Champ requis", "Saisis la nouvelle ville.", "OK");
-			return;
+			_appLogService.LogError("Modification site", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de modifier le site: {ex.Message}", "OK");
 		}
-
-		selectedSite.Ville = SiteVilleEntry.Text.Trim();
-		_siteService.Modifier(selectedSite);
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private async void OnDeleteSiteClicked(object? sender, EventArgs e)
 	{
-		if (SiteAdminPicker.SelectedItem is not Site selectedSite)
+		try
 		{
-			await DisplayAlertAsync("Selection requise", "Selectionne un site a supprimer.", "OK");
-			return;
-		}
+			if (SiteAdminPicker.SelectedItem is not Site selectedSite)
+			{
+				await DisplayAlertAsync("Selection requise", "Selectionne un site a supprimer.", "OK");
+				return;
+			}
 
-		var salaries = _salarieService.Lister();
-		if (salaries.Any(s => s.SiteId == selectedSite.Id))
+			var salaries = _salarieService.Lister();
+			if (salaries.Any(s => s.SiteId == selectedSite.Id))
+			{
+				await DisplayAlertAsync("Suppression impossible", "Ce site est utilise par des salaries.", "OK");
+				return;
+			}
+
+			_siteService.Supprimer(selectedSite.Id);
+			SiteVilleEntry.Text = string.Empty;
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Suppression impossible", "Ce site est utilise par des salaries.", "OK");
-			return;
+			_appLogService.LogError("Suppression site", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de supprimer le site: {ex.Message}", "OK");
 		}
-
-		_siteService.Supprimer(selectedSite.Id);
-		SiteVilleEntry.Text = string.Empty;
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private void OnSiteAdminSelectionChanged(object? sender, EventArgs e)
@@ -518,62 +586,86 @@ public partial class MainPage : ContentPage
 
 	private async void OnAddServiceClicked(object? sender, EventArgs e)
 	{
-		if (!_isAdminMode)
+		try
 		{
-			return;
-		}
+			if (!_isAdminMode)
+			{
+				return;
+			}
 
-		if (string.IsNullOrWhiteSpace(ServiceNomEntry.Text))
+			if (string.IsNullOrWhiteSpace(ServiceNomEntry.Text))
+			{
+				await DisplayAlertAsync("Champ requis", "Saisis le nom du service.", "OK");
+				return;
+			}
+
+			_serviceService.Ajouter(new Service { Nom = ServiceNomEntry.Text.Trim() });
+			ServiceNomEntry.Text = string.Empty;
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Champ requis", "Saisis le nom du service.", "OK");
-			return;
+			_appLogService.LogError("Ajout service", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible d'ajouter le service: {ex.Message}", "OK");
 		}
-
-		_serviceService.Ajouter(new Service { Nom = ServiceNomEntry.Text.Trim() });
-		ServiceNomEntry.Text = string.Empty;
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private async void OnUpdateServiceClicked(object? sender, EventArgs e)
 	{
-		if (ServiceAdminPicker.SelectedItem is not Service selectedService)
+		try
 		{
-			await DisplayAlertAsync("Selection requise", "Selectionne un service a modifier.", "OK");
-			return;
-		}
+			if (ServiceAdminPicker.SelectedItem is not Service selectedService)
+			{
+				await DisplayAlertAsync("Selection requise", "Selectionne un service a modifier.", "OK");
+				return;
+			}
 
-		if (string.IsNullOrWhiteSpace(ServiceNomEntry.Text))
+			if (string.IsNullOrWhiteSpace(ServiceNomEntry.Text))
+			{
+				await DisplayAlertAsync("Champ requis", "Saisis le nouveau nom du service.", "OK");
+				return;
+			}
+
+			selectedService.Nom = ServiceNomEntry.Text.Trim();
+			_serviceService.Modifier(selectedService);
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Champ requis", "Saisis le nouveau nom du service.", "OK");
-			return;
+			_appLogService.LogError("Modification service", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de modifier le service: {ex.Message}", "OK");
 		}
-
-		selectedService.Nom = ServiceNomEntry.Text.Trim();
-		_serviceService.Modifier(selectedService);
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private async void OnDeleteServiceClicked(object? sender, EventArgs e)
 	{
-		if (ServiceAdminPicker.SelectedItem is not Service selectedService)
+		try
 		{
-			await DisplayAlertAsync("Selection requise", "Selectionne un service a supprimer.", "OK");
-			return;
-		}
+			if (ServiceAdminPicker.SelectedItem is not Service selectedService)
+			{
+				await DisplayAlertAsync("Selection requise", "Selectionne un service a supprimer.", "OK");
+				return;
+			}
 
-		var salaries = _salarieService.Lister();
-		if (salaries.Any(s => s.ServiceId == selectedService.Id))
+			var salaries = _salarieService.Lister();
+			if (salaries.Any(s => s.ServiceId == selectedService.Id))
+			{
+				await DisplayAlertAsync("Suppression impossible", "Ce service est utilise par des salaries.", "OK");
+				return;
+			}
+
+			_serviceService.Supprimer(selectedService.Id);
+			ServiceNomEntry.Text = string.Empty;
+			LoadReferenceData();
+			ApplyFilters();
+		}
+		catch (Exception ex)
 		{
-			await DisplayAlertAsync("Suppression impossible", "Ce service est utilise par des salaries.", "OK");
-			return;
+			_appLogService.LogError("Suppression service", ex);
+			await DisplayAlertAsync("Erreur", $"Impossible de supprimer le service: {ex.Message}", "OK");
 		}
-
-		_serviceService.Supprimer(selectedService.Id);
-		ServiceNomEntry.Text = string.Empty;
-		LoadReferenceData();
-		ApplyFilters();
 	}
 
 	private void OnServiceAdminSelectionChanged(object? sender, EventArgs e)
@@ -605,143 +697,36 @@ public partial class MainPage : ContentPage
 
 			var fileName = $"annuaire-export-{DateTime.Now:yyyyMMdd-HHmmss}.pdf";
 			var exportPath = Path.Combine(exportDirectory, fileName);
-			var pdfBytes = BuildPdfDocument();
+			var salariesToExport = GetSalariesToExport();
+			var pdfBytes = _pdfExportService.BuildEmployeeDirectoryPdf(
+				salariesToExport,
+				serviceId => _services.Find(s => s.Id == serviceId)?.Nom ?? "Service inconnu",
+				siteId => _sites.Find(s => s.Id == siteId)?.Ville ?? "Site inconnu",
+				_databasePath);
 
 			File.WriteAllBytes(exportPath, pdfBytes);
-			await DisplayAlertAsync("Export termine", $"PDF genere:\n{exportPath}", "OK");
+			var exportScope = salariesToExport.Count == 1 ? "fiche salarie" : "fiches salaries";
+			await DisplayAlertAsync("Export termine", $"PDF genere ({exportScope}):\n{exportPath}", "OK");
 		}
 		catch (Exception ex)
 		{
+			_appLogService.LogError("Export PDF", ex);
 			await DisplayAlertAsync("Erreur", $"Impossible d'exporter en PDF: {ex.Message}", "OK");
 		}
 	}
 
-	private byte[] BuildPdfDocument()
+	private List<Salarie> GetSalariesToExport()
 	{
-		var lines = new List<string>
+		if (_editingSalarieId.HasValue)
 		{
-			"Annuaire Entreprise - Export base de donnees",
-			$"Date: {DateTime.Now:dd/MM/yyyy HH:mm}",
-			$"Fichier DB: {_databasePath}",
-			"",
-			$"Nombre de salaries: {_allSalaries.Count}",
-			""
-		};
-
-		foreach (var salarie in _allSalaries)
-		{
-			var serviceName = _services.Find(s => s.Id == salarie.ServiceId)?.Nom ?? "Service inconnu";
-			var siteName = _sites.Find(s => s.Id == salarie.SiteId)?.Ville ?? "Site inconnu";
-			lines.Add($"- {salarie.Nom} {salarie.Prenom} | {salarie.Email} | Fixe: {salarie.TelephoneFixe} | Portable: {salarie.TelephonePortable} | Service: {serviceName} | Site: {siteName}");
-		}
-
-		if (_allSalaries.Count == 0)
-		{
-			lines.Add("Aucun salarie dans la base.");
-		}
-
-		const int linesPerPage = 42;
-		var pageChunks = lines
-			.Select((line, index) => new { line, index })
-			.GroupBy(item => item.index / linesPerPage)
-			.Select(group => group.Select(item => item.line).ToList())
-			.ToList();
-
-		if (pageChunks.Count == 0)
-		{
-			pageChunks.Add(new List<string> { "Document vide." });
-		}
-
-		var pageCount = pageChunks.Count;
-		var fontObjectId = 3 + (2 * pageCount);
-		var objectCount = fontObjectId;
-		var objects = new string[objectCount + 1];
-
-		objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
-
-		var kids = string.Join(" ", Enumerable.Range(0, pageCount).Select(i => $"{3 + i} 0 R"));
-		objects[2] = $"<< /Type /Pages /Count {pageCount} /Kids [ {kids} ] >>";
-
-		for (var i = 0; i < pageCount; i++)
-		{
-			var pageObjectId = 3 + i;
-			var contentObjectId = 3 + pageCount + i;
-			objects[pageObjectId] = $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 {fontObjectId} 0 R >> >> /Contents {contentObjectId} 0 R >>";
-
-			var streamBuilder = new StringBuilder();
-			streamBuilder.AppendLine("BT");
-			streamBuilder.AppendLine("/F1 11 Tf");
-
-			var y = 800;
-			foreach (var rawLine in pageChunks[i])
+			var selectedSalarie = _allSalaries.Find(s => s.Id == _editingSalarieId.Value);
+			if (selectedSalarie is not null)
 			{
-				var safeLine = EscapePdfLiteral(ToAscii(rawLine));
-				streamBuilder.AppendLine($"1 0 0 1 40 {y} Tm");
-				streamBuilder.AppendLine($"({safeLine}) Tj");
-				y -= 18;
+				return [selectedSalarie];
 			}
-
-			streamBuilder.AppendLine("ET");
-
-			var streamContent = streamBuilder.ToString();
-			var streamLength = Encoding.ASCII.GetByteCount(streamContent);
-			objects[contentObjectId] = $"<< /Length {streamLength} >>\nstream\n{streamContent}endstream";
 		}
 
-		objects[fontObjectId] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
-
-		var pdfBuilder = new StringBuilder();
-		pdfBuilder.AppendLine("%PDF-1.4");
-
-		var offsets = new int[objectCount + 1];
-		for (var i = 1; i <= objectCount; i++)
-		{
-			offsets[i] = Encoding.ASCII.GetByteCount(pdfBuilder.ToString());
-			pdfBuilder.AppendLine($"{i} 0 obj");
-			pdfBuilder.AppendLine(objects[i]);
-			pdfBuilder.AppendLine("endobj");
-		}
-
-		var xrefOffset = Encoding.ASCII.GetByteCount(pdfBuilder.ToString());
-		pdfBuilder.AppendLine("xref");
-		pdfBuilder.AppendLine($"0 {objectCount + 1}");
-		pdfBuilder.AppendLine("0000000000 65535 f ");
-
-		for (var i = 1; i <= objectCount; i++)
-		{
-			pdfBuilder.AppendLine($"{offsets[i]:D10} 00000 n ");
-		}
-
-		pdfBuilder.AppendLine("trailer");
-		pdfBuilder.AppendLine($"<< /Size {objectCount + 1} /Root 1 0 R >>");
-		pdfBuilder.AppendLine("startxref");
-		pdfBuilder.AppendLine(xrefOffset.ToString());
-		pdfBuilder.Append("%%EOF");
-
-		return Encoding.ASCII.GetBytes(pdfBuilder.ToString());
-	}
-
-	private static string EscapePdfLiteral(string input)
-	{
-		return input.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
-	}
-
-	private static string ToAscii(string input)
-	{
-		var normalized = input.Normalize(NormalizationForm.FormD);
-		var builder = new StringBuilder();
-
-		foreach (var c in normalized)
-		{
-			if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark)
-			{
-				continue;
-			}
-
-			builder.Append(c is >= ' ' and <= '~' ? c : ' ');
-		}
-
-		return builder.ToString();
+		return _allSalaries.ToList();
 	}
 
 	private static string NormalizeName(string? value)
@@ -768,6 +753,7 @@ public partial class MainPage : ContentPage
 	{
 #if WINDOWS
 		Loaded += OnMainPageLoaded;
+		Unloaded += OnMainPageUnloaded;
 #endif
 	}
 
@@ -790,28 +776,34 @@ public partial class MainPage : ContentPage
 			return;
 		}
 
-		root.KeyDown += OnRootKeyDown;
+		_shortcutOwner = root;
+		_adminKeyboardAccelerator = new WinKeyboardAccelerator
+		{
+			Key = VirtualKey.A,
+			Modifiers = VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift
+		};
+		_adminKeyboardAccelerator.Invoked += OnAdminShortcutInvoked;
+		_shortcutOwner.KeyboardAccelerators.Add(_adminKeyboardAccelerator);
+
 		_shortcutRegistered = true;
 	}
 
-	private async void OnRootKeyDown(object sender, KeyRoutedEventArgs e)
+	private void OnMainPageUnloaded(object? sender, EventArgs e)
 	{
-		if (e.Key != VirtualKey.A)
+		if (_shortcutOwner is not null && _adminKeyboardAccelerator is not null)
 		{
-			return;
+			_adminKeyboardAccelerator.Invoked -= OnAdminShortcutInvoked;
+			_ = _shortcutOwner.KeyboardAccelerators.Remove(_adminKeyboardAccelerator);
 		}
 
-		var ctrlState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
-		var shiftState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
-		var ctrlDown = (ctrlState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
-		var shiftDown = (shiftState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+		_adminKeyboardAccelerator = null;
+		_shortcutOwner = null;
+		_shortcutRegistered = false;
+	}
 
-		if (!ctrlDown || !shiftDown)
-		{
-			return;
-		}
-
-		e.Handled = true;
+	private async void OnAdminShortcutInvoked(WinKeyboardAccelerator sender, WinKeyboardAcceleratorInvokedEventArgs args)
+	{
+		args.Handled = true;
 		await ToggleAdminModeAsync();
 	}
 #endif

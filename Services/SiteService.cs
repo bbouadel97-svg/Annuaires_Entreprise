@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AnnuaireEntreprise.Data;
 using AnnuaireEntreprise.Models;
+using Dapper;
 using Microsoft.Data.Sqlite;
 
 namespace AnnuaireEntreprise.Services
@@ -21,36 +22,19 @@ namespace AnnuaireEntreprise.Services
             using var connection = _database.GetConnection();
             connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = @"
-            INSERT INTO Sites (Ville)
-            VALUES ($ville)
-            ";
-            command.Parameters.AddWithValue("$ville", site.Ville);
-            command.ExecuteNonQuery();
+            connection.Execute(@"
+                INSERT INTO Sites (Ville)
+                VALUES (@Ville)
+                ", site);
         }
 
         // Lister tous les sites
         public List<Site> Lister()
         {
-            var result = new List<Site>();
             using var connection = _database.GetConnection();
             connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = "SELECT * FROM Sites";
-
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                result.Add(new Site
-                {
-                    Id = reader.GetInt32(0),
-                    Ville = reader.GetString(1)
-                });
-            }
-
-            return result;
+            return connection.Query<Site>("SELECT * FROM Sites").ToList();
         }
 
         // Modifier un site
@@ -59,15 +43,11 @@ namespace AnnuaireEntreprise.Services
             using var connection = _database.GetConnection();
             connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = @"
-            UPDATE Sites
-            SET Ville = $ville
-            WHERE Id = $id
-            ";
-            command.Parameters.AddWithValue("$id", site.Id);
-            command.Parameters.AddWithValue("$ville", site.Ville);
-            command.ExecuteNonQuery();
+            connection.Execute(@"
+                UPDATE Sites
+                SET Ville = @Ville
+                WHERE Id = @Id
+                ", site);
         }
 
         // Supprimer un site
@@ -76,10 +56,7 @@ namespace AnnuaireEntreprise.Services
             using var connection = _database.GetConnection();
             connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = "DELETE FROM Sites WHERE Id = $id";
-            command.Parameters.AddWithValue("$id", id);
-            command.ExecuteNonQuery();
+            connection.Execute("DELETE FROM Sites WHERE Id = @Id", new { Id = id });
         }
     }
 }

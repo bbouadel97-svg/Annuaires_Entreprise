@@ -2,136 +2,221 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AnnuaireEntreprise.MainPage"
-             Title="Annuaire Entreprise">
+             Title="Annuaire Entreprise"
+             BackgroundColor="{StaticResource PageBackground}">
 
-    <Grid RowDefinitions="2*,3*" Padding="20">
-        <ScrollView Grid.Row="0">
-        <VerticalStackLayout Spacing="10" Padding="0,0,0,16">
-            <Label Text="Annuaire Entreprise" FontSize="28" FontAttributes="Bold" />
-            <Label Text="Gestion des salaries" FontSize="14" TextColor="Gray" />
+    <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="14">
+        <ScrollView Grid.Row="0" MaximumHeightRequest="430">
+            <VerticalStackLayout Spacing="12" Padding="0,0,0,4">
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Annuaire Entreprise"
+                               FontSize="30"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}" />
+                        <Label Text="Accedez rapidement aux fiches collaborateurs et aux operations de gestion."
+                               FontSize="14"
+                               TextColor="{StaticResource Gray500}" />
 
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                <Button x:Name="AdminModeButton"
-                        Grid.Column="0"
-                        IsVisible="False"
-                        Text="Activer mode admin"
-                        Clicked="OnToggleAdminModeClicked" />
-                <Label x:Name="AdminModeLabel"
-                       Grid.Column="1"
-                       VerticalTextAlignment="Center"
-                       Text="Mode visiteur actif"
-                       TextColor="#B00020" />
-            </Grid>
-
-            <Entry x:Name="SearchEntry"
-                   Placeholder="Rechercher par nom"
-                   TextChanged="OnSearchTextChanged" />
-
-            <ScrollView Orientation="Horizontal"
-                        HorizontalScrollBarVisibility="Always">
-                <HorizontalStackLayout Spacing="10">
-                    <Button Text="Actualiser" Clicked="OnRefreshClicked" />
-                    <Button Text="Vider" Clicked="OnClearSearchClicked" />
-                    <Button x:Name="ImportApiButton" Text="Importer API" Clicked="OnImportApiClicked" />
-                    <Button x:Name="AddButton" Text="Ajouter" Clicked="OnAddClicked" />
-                    <Button x:Name="ExportPdfButton"
-                            Text="Exporter DB en PDF"
-                            Clicked="OnExportDbPdfClicked" />
-                </HorizontalStackLayout>
-            </ScrollView>
-
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                <Picker x:Name="SiteFilterPicker"
-                        Grid.Column="0"
-                        Title="Filtrer par site"
-                        ItemDisplayBinding="{Binding Ville}"
-                        SelectedIndexChanged="OnSiteFilterChanged" />
-                <Picker x:Name="ServiceFilterPicker"
-                        Grid.Column="1"
-                        Title="Filtrer par service"
-                        ItemDisplayBinding="{Binding Nom}"
-                        SelectedIndexChanged="OnServiceFilterChanged" />
-            </Grid>
-
-            <Label x:Name="DbPathLabel"
-                   FontSize="12"
-                   TextColor="Gray"
-                   LineBreakMode="TailTruncation" />
-
-            <Grid x:Name="AddFormTopGrid" ColumnDefinitions="*,*,*" ColumnSpacing="10">
-                <Entry x:Name="NomEntry" Grid.Column="0" Placeholder="Nom" />
-                <Entry x:Name="PrenomEntry" Grid.Column="1" Placeholder="Prenom" />
-                <Entry x:Name="EmailEntry" Grid.Column="2" Placeholder="Email" />
-            </Grid>
-
-            <Grid x:Name="AddFormBottomGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                <Entry x:Name="FixeEntry" Grid.Column="0" Placeholder="Tel fixe" />
-                <Entry x:Name="PortableEntry" Grid.Column="1" Placeholder="Tel portable" />
-                <Picker x:Name="ServicePicker" Grid.Column="2" Title="Service" ItemDisplayBinding="{Binding Nom}" />
-                <Picker x:Name="SitePicker" Grid.Column="3" Title="Site" ItemDisplayBinding="{Binding Ville}" />
-            </Grid>
-
-            <Button x:Name="UpdateButton"
-                    Text="Mettre a jour salarie selectionne"
-                    Clicked="OnUpdateSalarieClicked" />
-
-            <Border x:Name="AdminPanel"
-                    StrokeThickness="1"
-                    Stroke="#C9C9C9"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="10"
-                    IsVisible="False">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Panneau de gestion admin" FontAttributes="Bold" />
-
-                    <Grid ColumnDefinitions="2*,2*,Auto,Auto,Auto" ColumnSpacing="8">
-                        <Picker x:Name="SiteAdminPicker" Grid.Column="0" Title="Sites" ItemDisplayBinding="{Binding Ville}" SelectedIndexChanged="OnSiteAdminSelectionChanged" />
-                        <Entry x:Name="SiteVilleEntry" Grid.Column="1" Placeholder="Ville" />
-                        <Button Grid.Column="2" Text="Ajouter" Clicked="OnAddSiteClicked" />
-                        <Button Grid.Column="3" Text="Modifier" Clicked="OnUpdateSiteClicked" />
-                        <Button Grid.Column="4" Text="Supprimer" Clicked="OnDeleteSiteClicked" />
-                    </Grid>
-
-                    <Grid ColumnDefinitions="2*,2*,Auto,Auto,Auto" ColumnSpacing="8">
-                        <Picker x:Name="ServiceAdminPicker" Grid.Column="0" Title="Services" ItemDisplayBinding="{Binding Nom}" SelectedIndexChanged="OnServiceAdminSelectionChanged" />
-                        <Entry x:Name="ServiceNomEntry" Grid.Column="1" Placeholder="Nom service" />
-                        <Button Grid.Column="2" Text="Ajouter" Clicked="OnAddServiceClicked" />
-                        <Button Grid.Column="3" Text="Modifier" Clicked="OnUpdateServiceClicked" />
-                        <Button Grid.Column="4" Text="Supprimer" Clicked="OnDeleteServiceClicked" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-        </VerticalStackLayout>
-        </ScrollView>
-
-        <CollectionView Grid.Row="1"
-                        Margin="0,20,0,0"
-                        ItemsSource="{Binding Salaries}"
-                        SelectionMode="Single"
-                        SelectionChanged="OnSalarieSelectionChanged">
-            <CollectionView.EmptyView>
-                <Label Text="Aucun salarie trouve." HorizontalOptions="Center" Margin="0,30,0,0" />
-            </CollectionView.EmptyView>
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border StrokeThickness="1" Stroke="#DDDDDD" StrokeShape="RoundRectangle 8" Margin="0,0,0,8" Padding="10">
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-                            <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16" Text="{Binding NomComplet}" />
-                            <Button Grid.Row="0" Grid.Column="1"
-                                    Text="Supprimer"
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
+                            <Button x:Name="AdminModeButton"
+                                    Grid.Column="0"
+                                    IsVisible="False"
+                                    Text="Activer mode admin"
+                                    Clicked="OnToggleAdminModeClicked" />
+                            <Label x:Name="AdminModeLabel"
+                                   Grid.Column="1"
+                                   VerticalTextAlignment="Center"
+                                   Text="Mode visiteur actif"
+                                   TextColor="#B00020" />
+                            <Button x:Name="LogoutButton"
+                                    Grid.Column="2"
+                                    Text="Se deconnecter"
                                     BackgroundColor="#D32F2F"
                                     TextColor="White"
-                                    IsVisible="{Binding IsAdminActionsVisible}"
-                                    Clicked="OnDeleteClicked"
-                                    CommandParameter="{Binding Id}" />
-                            <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" />
-                            <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Details}" TextColor="Gray" FontSize="12" />
+                                    IsVisible="False"
+                                    Clicked="OnLogoutClicked" />
                         </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+
+                        <Label x:Name="DbPathLabel"
+                               FontSize="11"
+                               TextColor="{StaticResource Gray400}"
+                               LineBreakMode="TailTruncation"
+                               Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Recherche et filtres"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource Primary}" />
+
+                        <Entry x:Name="SearchEntry"
+                               Placeholder="Rechercher par nom ou prenom"
+                               TextChanged="OnSearchTextChanged" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Picker x:Name="SiteFilterPicker"
+                                    Grid.Column="0"
+                                    Title="Filtrer par site"
+                                    ItemDisplayBinding="{Binding Ville}"
+                                    SelectedIndexChanged="OnSiteFilterChanged" />
+                            <Picker x:Name="ServiceFilterPicker"
+                                    Grid.Column="1"
+                                    Title="Filtrer par service"
+                                    ItemDisplayBinding="{Binding Nom}"
+                                    SelectedIndexChanged="OnServiceFilterChanged" />
+                        </Grid>
+
+                        <ScrollView Orientation="Horizontal"
+                                    HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="8">
+                                <Button Text="Actualiser" Clicked="OnRefreshClicked" />
+                                <Button Text="Reinitialiser filtres"
+                                        BackgroundColor="{StaticResource Gray600}"
+                                        Clicked="OnClearSearchClicked" />
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Operations rapides"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource Primary}" />
+
+                        <ScrollView Orientation="Horizontal"
+                                    HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="8">
+                                <Button x:Name="AddButton"
+                                        Text="Ajouter un salarie"
+                                        Clicked="OnAddClicked" />
+                                <Button x:Name="UpdateButton"
+                                        Text="Mettre a jour la selection"
+                                        Clicked="OnUpdateSalarieClicked" />
+                                <Button x:Name="ImportApiButton"
+                                        Text="Importer API"
+                                        BackgroundColor="{StaticResource SecondaryDarkText}"
+                                        Clicked="OnImportApiClicked" />
+                                <Button x:Name="ExportPdfButton"
+                                        Text="Exporter DB en PDF"
+                                        BackgroundColor="{StaticResource Gray600}"
+                                        Clicked="OnExportDbPdfClicked" />
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Edition collaborateur"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource Primary}" />
+
+                        <Grid x:Name="AddFormTopGrid" ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                            <Entry x:Name="NomEntry" Grid.Column="0" Placeholder="Nom" />
+                            <Entry x:Name="PrenomEntry" Grid.Column="1" Placeholder="Prenom" />
+                            <Entry x:Name="EmailEntry" Grid.Column="2" Placeholder="Email" Keyboard="Email" />
+                        </Grid>
+
+                        <Grid x:Name="AddFormBottomGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                            <Entry x:Name="FixeEntry" Grid.Column="0" Placeholder="Telephone fixe" Keyboard="Telephone" />
+                            <Entry x:Name="PortableEntry" Grid.Column="1" Placeholder="Telephone portable" Keyboard="Telephone" />
+                            <Picker x:Name="ServicePicker" Grid.Column="2" Title="Service" ItemDisplayBinding="{Binding Nom}" />
+                            <Picker x:Name="SitePicker" Grid.Column="3" Title="Site" ItemDisplayBinding="{Binding Ville}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="AdminPanel"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14"
+                        IsVisible="False">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Panneau de gestion admin"
+                               FontAttributes="Bold"
+                               FontSize="15"
+                               TextColor="{StaticResource Primary}" />
+
+                        <Grid ColumnDefinitions="2*,2*,Auto,Auto,Auto" ColumnSpacing="8">
+                            <Picker x:Name="SiteAdminPicker" Grid.Column="0" Title="Sites" ItemDisplayBinding="{Binding Ville}" SelectedIndexChanged="OnSiteAdminSelectionChanged" />
+                            <Entry x:Name="SiteVilleEntry" Grid.Column="1" Placeholder="Ville" />
+                            <Button Grid.Column="2" Text="Ajouter" Clicked="OnAddSiteClicked" />
+                            <Button Grid.Column="3" Text="Modifier" Clicked="OnUpdateSiteClicked" />
+                            <Button Grid.Column="4" Text="Supprimer" BackgroundColor="#D32F2F" TextColor="White" Clicked="OnDeleteSiteClicked" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="2*,2*,Auto,Auto,Auto" ColumnSpacing="8">
+                            <Picker x:Name="ServiceAdminPicker" Grid.Column="0" Title="Services" ItemDisplayBinding="{Binding Nom}" SelectedIndexChanged="OnServiceAdminSelectionChanged" />
+                            <Entry x:Name="ServiceNomEntry" Grid.Column="1" Placeholder="Nom service" />
+                            <Button Grid.Column="2" Text="Ajouter" Clicked="OnAddServiceClicked" />
+                            <Button Grid.Column="3" Text="Modifier" Clicked="OnUpdateServiceClicked" />
+                            <Button Grid.Column="4" Text="Supprimer" BackgroundColor="#D32F2F" TextColor="White" Clicked="OnDeleteServiceClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="1"
+                StrokeThickness="0"
+                BackgroundColor="{StaticResource CardBackground}"
+                StrokeShape="RoundRectangle 16"
+                Padding="12">
+            <CollectionView ItemsSource="{Binding Salaries}"
+                            SelectionMode="Single"
+                            SelectionChanged="OnSalarieSelectionChanged">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6" Margin="0,26,0,0">
+                        <Label Text="Aucun salarie trouve" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" />
+                        <Label Text="Ajustez vos filtres ou ajoutez un collaborateur." FontSize="13" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                Stroke="{StaticResource Gray100}"
+                                BackgroundColor="White"
+                                StrokeShape="RoundRectangle 12"
+                                Margin="0,0,0,10"
+                                Padding="12">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                                <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16" Text="{Binding NomComplet}" />
+                                <Button Grid.Row="0" Grid.Column="1"
+                                        Text="Supprimer"
+                                        BackgroundColor="#D32F2F"
+                                        TextColor="White"
+                                        IsVisible="{Binding IsAdminActionsVisible}"
+                                        Clicked="OnDeleteClicked"
+                                        CommandParameter="{Binding Id}" />
+                                <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" TextColor="{StaticResource Gray600}" />
+                                <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Details}" TextColor="{StaticResource Gray500}" FontSize="12" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
     </Grid>
 
 </ContentPage>

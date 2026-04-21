@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using AnnuaireEntreprise.Data;
+using Dapper;
 
 namespace AnnuaireEntreprise.Services
 {
@@ -23,32 +24,25 @@ namespace AnnuaireEntreprise.Services
             using var connection = _database.GetConnection();
             connection.Open();
 
-            var command = connection.CreateCommand();
-            command.CommandText = @"
-            SELECT PasswordHash, PasswordSalt, Role
-            FROM Users
-            WHERE Username = $username
-            LIMIT 1
-            ";
-            command.Parameters.AddWithValue("$username", username.Trim());
+            var user = connection.QueryFirstOrDefault<UserRecord>(@"
+                SELECT PasswordHash, PasswordSalt, Role
+                FROM Users
+                WHERE Username = @Username
+                LIMIT 1
+                ", new { Username = username.Trim() });
 
-            using var reader = command.ExecuteReader();
-            if (!reader.Read())
+            if (user is null)
             {
                 return false;
             }
 
-            var storedHash = reader.GetString(0);
-            var storedSalt = reader.GetString(1);
-            var role = reader.GetString(2);
-
-            if (!string.Equals(role, "admin", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(user.Role, "admin", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            var computedHash = ComputeHash(password, storedSalt);
-            return string.Equals(storedHash, computedHash, StringComparison.Ordinal);
+            var computedHash = ComputeHash(password, user.PasswordSalt);
+            return string.Equals(user.PasswordHash, computedHash, StringComparison.Ordinal);
         }
 
         private static string ComputeHash(string password, string salt)
@@ -56,6 +50,13 @@ namespace AnnuaireEntreprise.Services
             using var sha = SHA256.Create();
             var bytes = Encoding.UTF8.GetBytes($"{salt}:{password}");
             return Convert.ToHexString(sha.ComputeHash(bytes));
+        }
+
+        private sealed class UserRecord
+        {
+            public string PasswordHash { get; init; } = string.Empty;
+            public string PasswordSalt { get; init; } = string.Empty;
+            public string Role { get; init; } = string.Empty;
         }
     }
 }
