@@ -13,10 +13,18 @@
                         StrokeShape="RoundRectangle 16"
                         Padding="16">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Annuaire Entreprise"
-                               FontSize="30"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource Primary}" />
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="&#xF0CBF;"
+                                   FontFamily="MDI"
+                                   FontSize="30"
+                                   TextColor="{StaticResource Primary}"
+                                   VerticalTextAlignment="Center" />
+                            <Label Text="Annuaire Entreprise"
+                                   FontSize="30"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   VerticalTextAlignment="Center" />
+                        </HorizontalStackLayout>
                         <Label Text="Accedez rapidement aux fiches collaborateurs et aux operations de gestion."
                                FontSize="14"
                                TextColor="{StaticResource Gray500}" />
@@ -26,7 +34,11 @@
                                     Grid.Column="0"
                                     IsVisible="False"
                                     Text="Activer mode admin"
-                                    Clicked="OnToggleAdminModeClicked" />
+                                    Clicked="OnToggleAdminModeClicked">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MDI" Glyph="&#xF099D;" Size="18" Color="White"/>
+                                </Button.ImageSource>
+                            </Button>
                             <Label x:Name="AdminModeLabel"
                                    Grid.Column="1"
                                    VerticalTextAlignment="Center"
@@ -38,7 +50,11 @@
                                     BackgroundColor="#D32F2F"
                                     TextColor="White"
                                     IsVisible="False"
-                                    Clicked="OnLogoutClicked" />
+                                    Clicked="OnLogoutClicked">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MDI" Glyph="&#xF0343;" Size="18" Color="White"/>
+                                </Button.ImageSource>
+                            </Button>
                         </Grid>
 
                         <Label x:Name="DbPathLabel"
@@ -59,9 +75,19 @@
                                FontSize="15"
                                TextColor="{StaticResource Primary}" />
 
-                        <Entry x:Name="SearchEntry"
-                               Placeholder="Rechercher par nom ou prenom"
-                               TextChanged="OnSearchTextChanged" />
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0"
+                                   Text="&#xF0349;"
+                                   FontFamily="MDI"
+                                   FontSize="22"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="{StaticResource Gray400}"
+                                   Padding="8,0" />
+                            <Entry x:Name="SearchEntry"
+                                   Grid.Column="1"
+                                   Placeholder="Rechercher par nom ou prenom"
+                                   TextChanged="OnSearchTextChanged" />
+                        </Grid>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <Picker x:Name="SiteFilterPicker"
@@ -79,10 +105,18 @@
                         <ScrollView Orientation="Horizontal"
                                     HorizontalScrollBarVisibility="Never">
                             <HorizontalStackLayout Spacing="8">
-                                <Button Text="Actualiser" Clicked="OnRefreshClicked" />
+                                <Button Text="Actualiser" Clicked="OnRefreshClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF0450;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                                 <Button Text="Reinitialiser filtres"
                                         BackgroundColor="{StaticResource Gray600}"
-                                        Clicked="OnClearSearchClicked" />
+                                        Clicked="OnClearSearchClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF0159;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                             </HorizontalStackLayout>
                         </ScrollView>
                     </VerticalStackLayout>
@@ -103,18 +137,34 @@
                             <HorizontalStackLayout Spacing="8">
                                 <Button x:Name="AddButton"
                                         Text="Ajouter un salarie"
-                                        Clicked="OnAddClicked" />
+                                        Clicked="OnAddClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF0415;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                                 <Button x:Name="UpdateButton"
                                         Text="Mettre a jour la selection"
-                                        Clicked="OnUpdateSalarieClicked" />
+                                        Clicked="OnUpdateSalarieClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF03EB;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                                 <Button x:Name="ImportApiButton"
                                         Text="Importer API"
                                         BackgroundColor="{StaticResource SecondaryDarkText}"
-                                        Clicked="OnImportApiClicked" />
+                                        Clicked="OnImportApiClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF02FA;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                                 <Button x:Name="ExportPdfButton"
                                         Text="Exporter DB en PDF"
                                         BackgroundColor="{StaticResource Gray600}"
-                                        Clicked="OnExportDbPdfClicked" />
+                                        Clicked="OnExportDbPdfClicked">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF0EF3;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
                             </HorizontalStackLayout>
                         </ScrollView>
                     </VerticalStackLayout>
@@ -200,17 +250,44 @@
                                 StrokeShape="RoundRectangle 12"
                                 Margin="0,0,0,10"
                                 Padding="12">
-                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
-                                <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="16" Text="{Binding NomComplet}" />
-                                <Button Grid.Row="0" Grid.Column="1"
-                                        Text="Supprimer"
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="&#xF0004;"
+                                       FontFamily="MDI"
+                                       FontSize="20"
+                                       TextColor="{StaticResource Primary}"
+                                       VerticalTextAlignment="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Row="0" Grid.Column="1" FontAttributes="Bold" FontSize="16" Text="{Binding NomComplet}" VerticalTextAlignment="Center" />
+                                <Button Grid.Row="0" Grid.Column="2"
                                         BackgroundColor="#D32F2F"
                                         TextColor="White"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        CornerRadius="8"
                                         IsVisible="{Binding IsAdminActionsVisible}"
                                         Clicked="OnDeleteClicked"
-                                        CommandParameter="{Binding Id}" />
-                                <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" TextColor="{StaticResource Gray600}" />
-                                <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Details}" TextColor="{StaticResource Gray500}" FontSize="12" />
+                                        CommandParameter="{Binding Id}">
+                                    <Button.ImageSource>
+                                        <FontImageSource FontFamily="MDI" Glyph="&#xF01C0;" Size="18" Color="White"/>
+                                    </Button.ImageSource>
+                                </Button>
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="&#xF01EE;"
+                                       FontFamily="MDI"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray500}"
+                                       VerticalTextAlignment="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Email}" TextColor="{StaticResource Gray600}" />
+                                <Label Grid.Row="2" Grid.Column="0"
+                                       Text="&#xF03F2;"
+                                       FontFamily="MDI"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Gray500}"
+                                       VerticalTextAlignment="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Details}" TextColor="{StaticResource Gray500}" FontSize="12" />
                             </Grid>
                         </Border>
                     </DataTemplate>

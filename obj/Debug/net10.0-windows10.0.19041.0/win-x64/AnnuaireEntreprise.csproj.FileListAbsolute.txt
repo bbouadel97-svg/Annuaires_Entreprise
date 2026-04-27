@@ -544,3 +544,5 @@ C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\obj\Debug\
 C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\obj\Debug\net10.0-windows10.0.19041.0\win-x64\qualifiers.txt
 C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\obj\Debug\net10.0-windows10.0.19041.0\win-x64\qualifiers.txt.intermediate
 C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\obj\Debug\net10.0-windows10.0.19041.0\win-x64\MultipleQualifiersPerDimensionFound.txt
+C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\bin\Debug\net10.0-windows10.0.19041.0\win-x64\materialdesignicons-webfont.ttf
+C:\Users\User\OneDrive\Bureau\Mes Projets 2eme_Sem\AnnuaireEntreprise\obj\Debug\net10.0-windows10.0.19041.0\win-x64\resizetizer\f\materialdesignicons-webfont.ttf
